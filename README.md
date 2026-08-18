@@ -22,10 +22,10 @@ This project aims to develop and evaluate a Retrieval-Augmented Generation chatb
  
 | Student ID | Full Name | Role / Skills | % Contribution |
 |---|---|---|---|
-|  S4193394  | Hanan Khan | TODO | 25% |
-|  S4194837  | Sumaiya Roza | [TODO] | [25%] |
-|  S4118280  | Zhi Yew Ngg  | [] | [25%] |
-|  S4165181  | Ziad Ashmawy | [TODO] | [25%] |
+|  S4193394  | Hanan Khan   | TODO | 25% |
+|  S4194837  | Sumaiya Roza | TODO | 25% |
+|  S4118280  | Zhi Yew Ngg  | TODO | 25% |
+|  S4165181  | Ziad Ashmawy | TODO | 25% |
 
 
 ## Domain and Motivation
