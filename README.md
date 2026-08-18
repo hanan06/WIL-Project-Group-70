@@ -8,7 +8,9 @@ This project is developed as part of **COSC2669 - Case Studies in Data Science (
 
 ## Group Information
 - **Group ID:** 70
+  
 - **Team Members**
+  
 | Student ID | Full Name | Role / Skills | % Contribution |
 |---|---|---|---|
 |  S4193394  | Hanan Khan   | TODO | 25% |
