@@ -1,17 +1,22 @@
+import os
 from pyserini.search import FaissSearcher
 from pyserini import trectools
 from pyserini.output_writer import OutputFormat, get_output_writer
 import pandas as pd
 
 DATA_DIR = "../../data"
-TOPICS = DATA_DIR + "/topics.csv"
+# NOTE: this used to point at data/topics.csv, which never existed for
+# this project (it was left over from Walert). Our actual test questions
+# live in data/eval/topics.csv - see data/eval/README.md.
+TOPICS = DATA_DIR + "/eval/topics.csv"
 
 # Dense Retrieval
 INDEX = "../../target/indexes/tct_colbert-v2-hnp-msmarco-faiss"
 QUERY_ENCODER = 'castorini/tct_colbert-v2-hnp-msmarco'
 OUTPUT_PATH = '../../target/runs/rag-dense-faiss.txt'
-RUN = "dense-faiss" 
+RUN = "dense-faiss"
 
+os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 topics = pd.read_csv(TOPICS)
 
 searcher = FaissSearcher(
