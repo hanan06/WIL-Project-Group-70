@@ -1,3 +1,11 @@
+# --- Added: packages this project's own code imports, that were missing
+# from the original Walert requirements.txt (see environment.yml for the
+# versions we actually tested with) ---
+groq==1.7.0
+pypdf==6.19.0
+python-dotenv==1.0.1
+streamlit==1.38.0
+
 annotated-types==0.5.0
 # autocast==0.0.1b1
 beautifulsoup4==4.12.2
