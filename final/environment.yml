@@ -90,6 +90,8 @@ dependencies:
       - fonttools==4.43.1
       - fsspec==2023.9.2
       - groq==1.7.0
+      - python-dotenv==1.0.1
+      - streamlit==1.38.0
       - huggingface-hub==0.16.4
       - humanfriendly==10.0
       - idna==3.4
