@@ -1,20 +1,3 @@
-"""
-prepare_bm25_corpus.py
------------------------
-Why this file exists:
-Pyserini's BM25 indexer (--collection JsonCollection) expects a FOLDER
-containing one or more files, where each line is a JSON object with an
-"id" field and a "contents" field.
-
-Our collection.jsonl already has one JSON object per line, but the text
-field is called "text" (used for the dense/FAISS pipeline), not
-"contents". So index-bm25.sh was pointing at a folder that didn't exist,
-in a format that wouldn't have worked anyway.
-
-Run this once before bash index-bm25.sh:
-    python prepare_bm25_corpus.py
-"""
-
 import os
 import json
 
