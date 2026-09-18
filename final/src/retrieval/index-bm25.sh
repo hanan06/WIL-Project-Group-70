@@ -1,4 +1,4 @@
-CORPUS="../../data/collection"
+CORPUS="../../data/collection_bm25"
 INDEX="../../target/indexes/bm25"
 
  python -m pyserini.index.lucene \
