@@ -1,30 +1,3 @@
-"""
-rag_core.py
------------
-Shared retrieval + generation logic for the Food Safety RAG Assistant.
-
-Both the command-line tool (run_rag.py) and the web app (app.py) import
-from this file, so the "how do we retrieve and answer" logic only exists
-in ONE place instead of being copy-pasted twice.
-
-SECURITY NOTE:
-The Groq API key is now read from an environment variable
-(GROQ_API_KEY) instead of being hardcoded into the source file. This
-means:
-  1. Your real key never gets committed to GitHub.
-  2. Each teammate can use their own key locally.
-
-How to set it (pick ONE):
-  Option A - .env file (recommended for local dev):
-      1. Copy .env.example to .env
-      2. Put your real key in .env
-      3. .env is already listed in .gitignore, so it will never be committed.
-
-  Option B - export it in your terminal before running anything:
-      export GROQ_API_KEY="your_real_key_here"      (macOS/Linux)
-      $env:GROQ_API_KEY="your_real_key_here"         (Windows PowerShell)
-"""
-
 import os
 import pandas as pd
 from pyserini.search import FaissSearcher
