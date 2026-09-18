@@ -1,21 +1,3 @@
-"""
-app.py
-------
-A minimal browser-based front end for the Food Safety RAG Assistant,
-using Streamlit. This is what turns your CLI tool into "a prototype of a
-browser-based interactive app", as suggested in the assignment brief -
-and it makes for a much better demo video than a terminal window.
-
-Setup (same as run_rag.py):
-    1. Copy .env.example (project root) to .env and add your Groq API key.
-    2. pip install -r requirements.txt   (or use the conda environment)
-
-Run it:
-    streamlit run app.py
-
-This opens a page in your browser at http://localhost:8501
-"""
-
 import streamlit as st
 from rag_core import answer_question
 
