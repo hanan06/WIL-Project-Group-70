@@ -1,107 +1,58 @@
+import os
 import pandas as pd
+from rag_core import retrieve
 
-DATA_DIR = "../../data"
+DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+EVAL_DIR = os.path.join(DATA_DIR, "eval")
+TOPICS = os.path.join(EVAL_DIR, "topics.csv")
+POOL_OUTPUT = os.path.join(EVAL_DIR, "pool.csv")
 
-COLLECTION = DATA_DIR + "/collection.csv"
-TOPICS = DATA_DIR + "/topics.csv"
-GROUNDTRUTH = DATA_DIR + "/groundtruth.csv"
-INTENT_MAPPING = DATA_DIR + "/intent_mapping.csv"
-WALERT_INTENT = DATA_DIR + "/walert_intent_results.csv"
-
-OUTPUT_PATH = '../../target/runs/walert-intent.txt'
+POOL_DEPTH = 10  # how many candidate passages to pull per question for judging
 
 
-def create_qrels(topics_filename, groundtruth_filename):
-    topics = pd.read_csv(topics_filename)
-    groundtruth = pd.read_csv(groundtruth_filename)
-    
-    data = pd.merge(topics, groundtruth, on='topic_id')
-    
+def build_pool():
+    os.makedirs(EVAL_DIR, exist_ok=True)
+    topics = pd.read_csv(TOPICS)
 
-    data['subtopic'] = 0
-    print(data.shape)
+    rows = []
+    for question_id, question in topics[["question_id", "question"]].values:
+        hits = retrieve(question, top_k=POOL_DEPTH)
+        for rank, hit in enumerate(hits, start=1):
+            rows.append({
+                "question_id": question_id,
+                "question": question,
+                "rank": rank,
+                "passage_id": hit["passage_id"],
+                "passage_text": hit["text"][:300],  # trimmed for readability while judging
+                "relevance": "",  # <-- fill this in by hand: 0, 1, or 2
+            })
 
-    qrels=data[['question_id', 'subtopic', 'passage_id', 'relevance_judgment']]
-    print(qrels.head())
-    qrels.to_csv(DATA_DIR + "/qrels.txt", sep='\t', index=False, header=False)
-
-
-def create_pyserini_collection(collection_filename):
-     collection = pd.read_csv(collection_filename)
-     collection.columns = ['id', 'contents']
-     collection.to_json(DATA_DIR + "/collection.jsonl", orient='records', lines=True)   
-
-def create_topics_msmarco_format(topics_filename):
-    topics = pd.read_csv(topics_filename)  
-    topics = topics[['question_id', 'question']]
-    topics.to_csv(DATA_DIR + "/topics.msmarco-format.txt", sep='\t', index=False, header=False)
+    pool_df = pd.DataFrame(rows)
+    pool_df.to_csv(POOL_OUTPUT, index=False)
+    print(f"Wrote {len(pool_df)} candidate (question, passage) pairs to {POOL_OUTPUT}")
+    print("Next step: open this file, fill in the 'relevance' column by hand, "
+          "then save the judged rows as data/eval/qrels.csv")
 
 
-def parse_walert_run(topics_filename, groundtruth_filename, walert_filename, intent_mapping_filename, collection_filename):
-    topics = pd.read_csv(topics_filename)
-    groundtruth = pd.read_csv(groundtruth_filename)
-    intents = pd.read_csv(intent_mapping_filename)
-    collection = pd.read_csv(collection_filename)
+def build_qrels_from_judged_pool(judged_pool_path=POOL_OUTPUT, output_path=None):
+    """
+    Once you've filled in the 'relevance' column of pool.csv (or a copy of
+    it) by hand, run this to produce the clean qrels.csv that eval.py
+    expects (only the judged, relevant rows, in the right column format).
+    """
+    if output_path is None:
+        output_path = os.path.join(EVAL_DIR, "qrels.csv")
 
-    merged = pd.merge(topics, groundtruth, on='topic_id')
-    merged_intents = pd.merge(merged, intents, on='question')
-    pd.set_option('display.max_columns', None)
+    df = pd.read_csv(judged_pool_path)
+    df = df[pd.to_numeric(df["relevance"], errors="coerce").notna()]
+    df["relevance"] = df["relevance"].astype(int)
+    df = df[df["relevance"] > 0]  # keep only judged-relevant rows
 
-    #print(merged_intents.head())
-    walert = pd.read_csv(walert_filename)
-    walert = pd.merge(topics, walert, on="question")
-
-    runid = "walert_intent"  
-    
-    with open(OUTPUT_PATH, 'w') as output_writer:
-        
-        for question_id, question in topics[['question_id','question']].values:
-            row = walert[walert['question_id'] == question_id]
-            if (row.values.shape[0] == 0):
-                "No results found for question: {}".format(question)
-                continue
-        
-            intent = row['actual'].values[0]
-            
-            if intent != "AMAZON.FallbackIntent":
-                #obtain the passages associated with the intent
-                passages = merged_intents[merged_intents['intent'] == intent]
-                
-                if (intent == "Summary"):
-                    # create a dummy passage:
-                    result = "P_Summary"
-                elif (intent == "BTS"):
-                    result = "P_BTS"
-                elif (intent == "Degree_Type"):
-                    result = "P_Degree_Type"
-                elif (intent == "Comparison_Bachelors_Associate"):
-                    result = "P_Comparison_Bachelors_Associate"
-                elif (passages.shape[0] == 0):
-                    print("No passages found for intent: {}".format(intent))   
-                    #print(row)
-                    print(intent)
-                else:
-                    #pick one and return it as the ranking for the intent
-                    result = passages.passage_id.values[0]
-                #generate line for TREC format:
-                line = "{} Q0 {} 1 1.0 {}\n".format(question_id, result, runid)
-                output_writer.write(line)
+    qrels = df[["question_id", "passage_id", "relevance"]]
+    qrels.to_csv(output_path, index=False)
+    print(f"Wrote {len(qrels)} relevance judgments to {output_path}")
 
 
-
-    
-    
-    
-    
-
-#TODO: Create main funcion with argparse
 if __name__ == "__main__":
-    create_qrels(TOPICS, GROUNDTRUTH)
-    create_pyserini_collection(COLLECTION)
-    parse_walert_run(TOPICS, GROUNDTRUTH, WALERT_INTENT, INTENT_MAPPING,COLLECTION)
-
-
-
-
-#   create_topics_msmarco_format(TOPICS)
+    build_pool()
 
