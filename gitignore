@@ -1,0 +1,22 @@
+# --- Secrets: never commit real API keys ---
+.env
+*.env
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- Conda ---
+*.egg-info/
+
+# --- Streamlit ---
+.streamlit/secrets.toml
