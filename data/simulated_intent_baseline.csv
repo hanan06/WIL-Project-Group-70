@@ -1,0 +1,11 @@
+question,actual
+What proportion of Australian infants develop a food allergy?,InfantAllergy
+How common are food allergies in Australian infants under one year?,AMAZON.FallbackIntent
+What is anaphylaxis and why is it dangerous?,Anaphylaxis
+Can food allergies cause life threatening reactions?,AMAZON.FallbackIntent
+What does the law require food businesses to do regarding allergen questions?,Law
+Are food businesses legally obligated to provide allergen information?,Law
+What is the only safe way to manage a diagnosed food allergy?,AMAZON.FallbackIntent
+Is there a safe consumption limit for someone sensitized to an allergen?,Manage
+Where do most fatal food allergy anaphylaxis reactions occur?,Death
+Do food allergy deaths happen mostly outside the home?,AMAZON.FallbackIntent

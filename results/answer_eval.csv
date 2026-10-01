@@ -1,0 +1,32 @@
+question,type,retrieved_ids,answer,auto_refused,faithful_to_sources,factually_correct,correct_refusal_if_out_of_scope,notes
+What proportion of Australian infants develop a food allergy?,in_scope,P0001 P0689 P0024,Approximately **10 %** of Australian infants (about 1 in 10 babies) develop a food allergy.,False,1,1,,Matches the guide's stated ~10% infant allergy prevalence.
+How common are food allergies in Australian infants under one year?,in_scope,P0001 P0689 P0024,"Food allergies are fairly common in Australian infants.  According to the information provided, **about 1 in 10 (≈10 %) Australian infants under one year of age will develop a food allergy**.",False,1,1,,Paraphrase of the same figure as Q1; supported.
+What is anaphylaxis and why is it dangerous?,in_scope,P0003 P0688 P0024,"**Anaphylaxis** is a severe allergic reaction that can be life‑threatening.  
+- It is an immune‑system response to a food allergen (or other allergen).  
+- The reaction can develop rapidly and may lead to death if not treated immediately.  
+
+Because it can cause a sudden, potentially fatal response, it is considered the most dangerous type of food‑allergy reaction.",False,0,1,,"Core claim correct, but adds unsupported specifics (""rapidly"", ""if not treated immediately"") not stated in the retrieved passages."
+Can food allergies cause life threatening reactions?,in_scope,P0004 P0024 P0688,"Yes.  
+All three documents state that food allergies can trigger life‑threatening reactions.  
+
+- **Doc 1** notes that “some signs and symptoms can lead to death.”  
+- **Doc 2** says the most severe reaction is anaphylaxis, “which is potentially life‑threatening.”  
+- **Doc 3** describes anaphylaxis as “life‑threatening.”",False,1,1,,Each quoted claim traces to one of the 3 retrieved passages.
+What does the law require food businesses to do regarding allergen questions?,in_scope,P0026 P0032 P0031,"The law requires food businesses to:
+
+1. **Provide accurate allergen information** – When a consumer asks for it, the business must give correct written or verbal details about the food’s allergen content.  
+2. **Respond honestly and promptly** – Businesses must take allergen requests seriously, listen carefully, and not guess. If they do not know the information, they must seek it out.  
+3. **Have a procedure in place** – A system or process must exist to manage allergen‑related requests from consumers.  
+
+These obligations are set out in the Food Act 2001 and the Food Standards Code.",False,1,1,,Matches Food Act 2001 / Food Standards Code obligations in the retrieved passage.
+Are food businesses legally obligated to provide allergen information?,in_scope,P0026 P0032 P0031,"Yes.  
+According to the Food Act 2001 and the Food Standards Code, a food business **must provide written or verbal allergen information to a consumer when the consumer asks for it**. The code requires that businesses give accurate information about the food and its ingredients, and that they have a procedure in place to manage such requests. Failure to do so can result in penalties, including fines or imprisonment.",False,1,1,,Same source passage as Q5; consistent and supported.
+What is the only safe way to manage a diagnosed food allergy?,in_scope,P0706 P0013 P0712,The knowledge base does not contain information on “the only safe way to manage a diagnosed food allergy.”,True,1,0,,"Correctly made no false claim, but the answer exists in the KB (P0001/P0002) and retrieval missed it."
+Is there a safe consumption limit for someone sensitized to an allergen?,in_scope,P0090 P0026 P0028,The information you’re looking for isn’t covered in the passages provided.,True,1,0,,"Same failure mode as Q7: safe refusal, but retrieval missed the passage with the answer."
+Where do most fatal food allergy anaphylaxis reactions occur?,in_scope,P0003 P0002 P0024,"Most fatal food‑allergy anaphylaxis reactions occur when the person is eating outside the home – for example, in restaurants or other food‑service settings.",False,1,1,,Supported by retrieved passage on reaction locations.
+Do food allergy deaths happen mostly outside the home?,in_scope,P0689 P0004 P0006,"The retrieved passages do not provide information on whether food‑allergy deaths occur mostly outside the home. They only state that most allergic reactions happen when people are eating outside the home, but they do not address the location of fatal reactions.",True,1,0,,Refusal is safe (no false claim) but the answer exists; retrieval missed it (same root cause as Q7/Q8).
+How do I file my tax return in Australia?,out_of_scope,P0228 P0673 P0056,"I’m sorry, but the information you’re looking for isn’t covered in the documents provided.",True,,,1,Correctly declined; no hallucinated answer.
+What is the best way to train for a marathon?,out_of_scope,P0040 P0051 P0048,"I’m sorry, but the information you’re looking for isn’t covered in the documents provided.",True,,,1,Correctly declined; no hallucinated answer.
+How do I change a flat tyre?,out_of_scope,P0611 P0020 P0702,"I’m sorry, but the information you’re looking for isn’t covered in the documents provided.",True,,,1,Correctly declined; no hallucinated answer.
+What is the capital of Peru?,out_of_scope,P0606 P0053 P0540,"I’m sorry, but the provided documents do not contain information about the capital of Peru.",True,,,1,Correctly declined; no hallucinated answer.
+How do I invest in shares?,out_of_scope,P0671 P0027 P0672,"I’m sorry, but the information you’re looking for isn’t covered in the documents provided.",True,,,1,Correctly declined; no hallucinated answer.
