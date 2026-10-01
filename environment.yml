@@ -1,0 +1,18 @@
+name: walert
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - openjdk=21
+  - faiss-cpu
+  - pytorch
+  - pandas
+  - pip:
+      - pyserini==0.22.0
+      - ranx
+      - groq
+      - pypdf
+      - python-dotenv
+      - streamlit
+
