@@ -79,7 +79,7 @@ Findings from a single reviewer pass over the 15 answers against their retrieved
 
 ## 8. Handover: how to run
 
-**One-time setup:** `conda env create -f environment.yml`, then `conda activate walert`. Java is required for BM25. Copy `.env.example` to `.env` in the project root and add your own free Groq key as `GROQ_API_KEY` (never type it into a `.py` file; `.env` is git-ignored). The key is only needed for `eval_answers.py` and `run_rag.py`.
+**One-time setup:** `conda env create -f environment.yml`, then `conda activate walert`. Java is required for BM25. Put your own free Groq API key in the `GROQ_API_KEY` variable near the top of `src/retrieval/run_rag.py` (left blank in the submission; it is only needed for `eval_answers.py` and `run_rag.py`). Never commit a real key.
 
 **Run everything:**
 ```
