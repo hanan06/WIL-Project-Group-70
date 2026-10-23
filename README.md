@@ -1,78 +1,132 @@
-Food Safety & Allergen Risk Assistant (RAG)
+# Allergen Safety Assistant: a test-driven RAG assistant for food-allergen questions
 
-An end-to-end Retrieval-Augmented Generation (RAG) system grounded in official Australian food safety regulations and guidelines (FSANZ Standards, SA Health, Better Health Channel).
+Group 70, COSC2669/COSC2816 Work Integrated Learning Project, RMIT University, 2026.
 
-The pipeline uses dense semantic retrieval (ColBERT embeddings indexed with FAISS) and external LLM synthesis via Groq to deliver fast, accurate answers without local hardware bottlenecks.
-Prerequisites
+A retrieval-augmented generation (RAG) prototype that answers front-of-house staff questions about food allergens
+using only six official Australian guidance documents (719 passages). It shows the passages it used and replies
+"not covered" instead of guessing. The pipeline adapts [Walert](https://github.com/rmit-ir/walert).
 
-    Conda: Miniforge (recommended for macOS/Apple Silicon) or Miniconda installed.
+- Retrieval: TCT-ColBERT v2 embeddings, FAISS HNSW index (Pyserini), top 3 passages.
+- Generation: `openai/gpt-oss-20b` through the free Groq API, temperature 0.1.
+- Evaluation: Hit@k, MRR, nDCG@10 with bootstrap confidence intervals, BM25 and random baselines,
+  and answer-level scoring (faithfulness, correctness, correct refusal, unanswered rate).
 
-    Groq API Key: A free developer API key from console.groq.com (no credit card required).
+Full results and discussion are in the written report. A short results summary is in `eval_summary.md`.
 
-1. Environment Setup
+## 1. Environment setup
 
-Open your terminal, navigate to the project root, and recreate the working Conda environment:
+Requires Conda (Miniforge or Miniconda). Java is installed by the environment file (needed for BM25).
 
+```
 conda env create -f environment.yml
 conda activate walert
+```
 
-    VS Code Note (Fix "Import could not be resolved"):
-    If VS Code displays red warnings under import pyserini or import groq:
+`requirements.txt` is a pip-only alternative, but the Conda route is the one we tested.
 
-        Press Cmd + Shift + P (macOS) or Ctrl + Shift + P (Windows).
+VS Code: if imports such as `pyserini` or `groq` show "could not be resolved", choose
+"Python: Select Interpreter" and pick the `walert` environment.
 
-        Search for "Python: Select Interpreter".
+## 2. Groq API key (free, no credit card)
 
-        Choose the entry pointing to your walert environment (e.g., ~/miniforge3/envs/walert/bin/python or ~/miniconda3/envs/walert/python.exe).
+1. Create a key at https://console.groq.com.
+2. In the project root, copy `.env.example` to `.env` and put your key in it:
+   ```
+   GROQ_API_KEY=your_key_here
+   ```
+3. `.env` is listed in `.gitignore`, so it is never committed. Do not paste the key into any `.py` file.
 
-2. Running the System (Pre-Built Index Included)
+The key is only needed for `run_rag.py` and `eval_answers.py`. Retrieval-only steps do not need it.
 
-The FAISS index and ColBERT embeddings are already pre-computed in target/. You can run the assistant immediately without waiting to re-index.
-Option A: End-to-End RAG (Retrieval + Answer Synthesis)
+## 3. Run the assistant (pre-built index included)
 
-    Open src/retrieval/run_rag.py.
+The FAISS index and embeddings are already in `target/`, so there is nothing to build.
 
-    Insert your Groq API key on line 7:
-    GROQ_API_KEY = "your_actual_api_key_here"
-
-    Run the interactive terminal assistant:
-    cd src/retrieval
-    python run_rag.py
-
-    Ask your question at the prompt (e.g., "How long can cooked rice sit at room temperature?" or "What are the mandatory allergen labelling requirements in Australia?"). Type exit or q to quit.
-
-Option B: Retrieval Inspection Only
-
-To inspect the retrieved document passages directly from the FAISS index without invoking the LLM:
-
+```
 cd src/retrieval
-python test_rag.py
-3. Rebuilding the Index (Optional)
+python run_rag.py      # full RAG: answer plus numbered sources (passage ID and document name)
+python test_rag.py     # retrieval only, no API key needed
+```
 
-You only need to run this if you modify the dataset or add new PDFs to data/pdfs/:
+Example questions: "Are food businesses legally obligated to provide allergen information?",
+"What is anaphylaxis and why is it dangerous?". Type `exit` to quit.
 
+## 4. Reproduce the evaluation
+
+```
+cd src/retrieval
+bash main.sh
+```
+
+`main.sh` builds the qrels, builds the BM25 index, runs dense, BM25 and random searches, runs the eval
+self-test, prints the retrieval table (Hit@k, MRR, nDCG@10 with 95% bootstrap confidence intervals), and finally
+runs all 15 questions through the full RAG to write `target/answer_eval.csv`.
+
+- Retrieval numbers are reproducible (seeded random baseline and bootstrap, deterministic FAISS HNSW search).
+- LLM wording is not deterministic, so re-running gives slightly different answer text.
+- The scored copy used in the report is `results/answer_eval.csv`. `main.sh` writes to `target/`, so it never
+  overwrites it.
+- `python eval.py --selftest` checks the metrics against hand-computed cases. If `pytrec_eval` is installed it
+  also cross-checks reciprocal rank against it.
+
+## 5. Rebuilding the index (only if you change the PDFs)
+
+```
 cd src/retrieval
 python process_pdfs.py
 bash encode.sh
 bash index.sh
-Repository Structure
+```
 
-FINAL_RAG/
-├── README.md                  # Setup and execution guide
-├── environment.yml            # Exported Conda environment specifications
-├── requirements.txt           # Pip dependencies backup
-├── target/                    # Pre-built ColBERT embeddings & FAISS index
-│   ├── embeddings/
-│   └── indexes/
+Warning: `process_pdfs.py` reads the PDFs in the order the operating system lists them, and passage IDs
+(P0001 to P0719) depend on that order. `data/groundtruth.csv`, `data/qrels.txt` and the document ranges in
+`run_rag.py` all use the current IDs, so a rebuild can silently misalign them. Check the IDs and update those
+files before trusting any new results. The current corpus does not need a rebuild.
+
+## Repository structure
+
+```
+.
+├── README.md
+├── environment.yml            # Conda environment (tested)
+├── requirements.txt           # pip alternative
+├── .env.example               # template for your Groq key (copy to .env)
+├── eval_summary.md            # results summary and handover notes
 ├── data/
-│   ├── pdfs/                  # Source regulatory documents & guidelines
-│   ├── collection.csv         # Chunked passages mapped by passage_id
-│   └── collection.jsonl       # Chunked corpus formatted for Pyserini
-└── src/
-└── retrieval/
-├── process_pdfs.py    # Extracts and chunks text from data/pdfs/
-├── encode.sh          # Generates ColBERT embeddings
-├── index.sh           # Builds the FAISS HNSW graph index
-├── search.py          # TREC-compliant retrieval runner
-├── test_rag.py        # Interactive CLI for testing retrieval only
-└── run_rag.py         # Full end-to-end RAG assistant via Groq API
+│   ├── pdfs/                  # the six source documents
+│   ├── collection.csv         # 719 passages (passage_id, passage)
+│   ├── collection.jsonl       # same passages in Pyserini format
+│   ├── topics.csv             # 10 in-scope test questions (5 topics x 2 paraphrases)
+│   ├── groundtruth.csv        # relevance labels per topic
+│   ├── qrels.txt              # relevance labels per question (built by data.py)
+│   ├── simulated_intent_baseline.csv   # ILLUSTRATIVE only, not a measured system
+│   ├── intent_mapping.csv     # Walert leftover used only by the illustrative baseline
+│   └── README.md              # describes every data file
+├── results/
+│   └── answer_eval.csv        # the 15 answers with manual scores
+├── src/
+│   └── retrieval/
+│       ├── process_pdfs.py    # extract and chunk PDFs (200 words, 30 overlap)
+│       ├── encode.sh          # TCT-ColBERT embeddings
+│       ├── index.sh           # FAISS HNSW index
+│       ├── search.py          # dense retrieval run (TREC format)
+│       ├── prepare_bm25.py, index-bm25.sh, search_bm25.py   # BM25 baseline
+│       ├── random_baseline.py # random sanity baseline
+│       ├── data.py            # builds qrels (and the illustrative intent run)
+│       ├── eval.py            # retrieval metrics, bootstrap CIs, --selftest
+│       ├── eval_answers.py    # runs 15 questions through the RAG, writes the scoring sheet
+│       ├── run_rag.py         # interactive RAG assistant (Groq)
+│       ├── test_rag.py        # interactive retrieval-only tool
+│       ├── main.sh            # runs the whole evaluation
+│       └── search.sh          # DEPRECATED (kept to document a failed approach, see report Appendix E.1)
+└── target/
+    ├── embeddings/            # pre-built TCT-ColBERT embeddings
+    └── indexes/               # pre-built FAISS index (BM25 index and runs are generated by main.sh)
+```
+
+## Limitations
+
+Prototype only, not a certified food-safety, legal or medical tool. It does not know a specific menu, so it cannot
+say whether a particular dish contains an allergen. The test set is small (10 in-scope and 5 out-of-scope
+questions, all in-scope questions from one document) and relevance labels are incomplete, so retrieval scores
+are lower bounds. Answers were scored by one reviewer. See the report, sections 3 to 4.
