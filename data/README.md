@@ -28,4 +28,4 @@ The five out-of-scope questions (tax return, marathon, flat tyre, capital of Per
 | Safe Food Australia, 4th ed. | FSANZ | P0058 to P0687 | 630 |
 | All about Allergens, v1.2 | National Allergy Council | P0688 to P0719 | 32 |
 
-These ranges are used by `run_rag.py` to print the source document name next to each retrieved passage.
+These ranges show which document each passage ID comes from (for example, the report cites P0026 as the SA Health page).
