@@ -30,11 +30,9 @@ VS Code: if imports such as `pyserini` or `groq` show "could not be resolved", c
 ## 2. Groq API key (free, no credit card)
 
 1. Create a key at https://console.groq.com.
-2. In the project root, copy `.env.example` to `.env` and put your key in it:
-   ```
-   GROQ_API_KEY=your_key_here
-   ```
-3. `.env` is listed in `.gitignore`, so it is never committed. Do not paste the key into any `.py` file.
+2. Open `src/retrieval/run_rag.py` and paste the key between the quotes on the `GROQ_API_KEY = ""` line near the top.
+3. Never commit a real key. We submit the file with the key left blank. (A production system should load the key
+   from an environment variable instead.)
 
 The key is only needed for `run_rag.py` and `eval_answers.py`. Retrieval-only steps do not need it.
 
@@ -44,7 +42,7 @@ The FAISS index and embeddings are already in `target/`, so there is nothing to 
 
 ```
 cd src/retrieval
-python run_rag.py      # full RAG: answer plus numbered sources (passage ID and document name)
+python run_rag.py      # full RAG: answer plus the three source passages it used
 python test_rag.py     # retrieval only, no API key needed
 ```
 
@@ -90,7 +88,6 @@ files before trusting any new results. The current corpus does not need a rebuil
 ├── README.md
 ├── environment.yml            # Conda environment (tested)
 ├── requirements.txt           # pip alternative
-├── .env.example               # template for your Groq key (copy to .env)
 ├── eval_summary.md            # results summary and handover notes
 ├── data/
 │   ├── pdfs/                  # the six source documents
