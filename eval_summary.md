@@ -28,7 +28,7 @@ This file records the evaluation results already obtained, so nobody has to re-r
 ## 3. How the evaluation code was verified
 
 - `eval.py --selftest` passes on hand-computed cases (MRR, Hit, Recall, nDCG, graded relevance, missing queries, perfect and random runs).
-- It was also cross-checked against the independent `pytrec_eval` library (passed in the sandbox where it was tested; skipped on the team's Mac because the library isn't installed).
+- When `pytrec_eval` is installed, the self-test also compares reciprocal rank against it on hand-built cases (it is skipped where the library is not installed, e.g. on the team's Mac). It does not cross-check nDCG or Hit@k.
 - Independent cross-check on real data: Hit@3 recomputed by hand from the retrieved IDs saved in `answer_eval.csv` is 0.30, identical to the value `eval.py` reports.
 - The original `eval.py` hardcoded 100% and never read a run file. It was replaced.
 - Results are reproducible: the random baseline is seeded (42), bootstrap CIs are seeded, and FAISS HNSW search is deterministic. **LLM answers are not** deterministic, so re-running `eval_answers.py` can give different text.
@@ -48,7 +48,7 @@ Findings from a single reviewer pass over the 15 answers against their retrieved
 
 - **Unanswered rate on in-scope questions: 30% (3 of 10).** Cause: retrieval did not return P0001/P0002, which hold the answer. The three affected questions: "only safe way to manage a food allergy", "safe consumption limit" and "deaths mostly outside the home".
 - Claims that were spot-checked and found supported: Food Act 2001 and Food Standards Code (P0026), fines or imprisonment up to four years (P0026), "do not guess, seek it out" (P0026), "Some signs and symptoms can lead to death" (P0004).
-- Row 9's refusal says the passages only cover reactions in general. That statement was not checked against the passages.
+- Row 9's refusal (Q10) was checked against the three retrieved passages (P0689, P0004, P0006): none states where fatal reactions occur, so the refusal was correct for the passages it was given.
 
 **Out-of-scope (5 questions):** 5 of 5 correctly refused, with no hallucinated answers.
 
@@ -79,7 +79,7 @@ Findings from a single reviewer pass over the 15 answers against their retrieved
 
 ## 8. Handover: how to run
 
-**One-time setup:** `conda env create -f environment.yml`, then `conda activate walert`. Java is required for BM25. Put your own Groq key on line 7 of `src/retrieval/run_rag.py` (left blank in the submission; it is only needed for `eval_answers.py` and `run_rag.py`).
+**One-time setup:** `conda env create -f environment.yml`, then `conda activate walert`. Java is required for BM25. Copy `.env.example` to `.env` in the project root and add your own free Groq key as `GROQ_API_KEY` (never type it into a `.py` file; `.env` is git-ignored). The key is only needed for `eval_answers.py` and `run_rag.py`.
 
 **Run everything:**
 ```
